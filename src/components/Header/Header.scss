@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Roboto&display=swap');
+
+
+.nav-link{
+    margin-right: 5rem;
+    .menu-link{
+        margin-right: 1rem;
+        font-family: 'Roboto', sans-serif;
+        font-size: x-large;
+        .link{
+            color: white;
+        }
+       
+        .pipe{
+            // display: none;
+            color: black;
+        }
+        &:hover{
+            .link{
+                color: #4285F4;
+            }
+             
+            .pipe{
+            color:yellow;
+            // display: unset;
+            font-weight: bold;
+            font-size: x-larger;
+            animation: blinker 1s linear infinite;
+            @keyframes blinker {
+                50%{
+                    opacity: 0;
+                }
+            }
+        }
+    }
+
+
+    }
+}
+    

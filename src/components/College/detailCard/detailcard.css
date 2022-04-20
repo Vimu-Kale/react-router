@@ -1,0 +1,17 @@
+.card-box{
+    height: 300px;
+    width: 100%;
+    background-color: #F8F9F9 !important;
+
+}
+
+.card-paper{
+    height: 100%;
+    padding: 25px;
+    overflow: hidden;
+}
+
+.card-text{
+    font-size: 18px;
+    margin-bottom: 10px;
+}

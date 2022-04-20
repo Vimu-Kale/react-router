@@ -11,16 +11,8 @@ function UserList() {
   }
 
   return (
-    <div>
-      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"1rem"}}> 
-          <Button 
-            variant="contained" 
-            color="success" 
-            sx={{height:"3rem",width:"20rem"}}
-            onClick={()=>{navigate('/userdetailsform')}}  
-          >
-              Add User Details
-          </Button>
+    <div style={{marginTop:"1rem",textAlign:"center"}}>
+      <div > 
           <Button 
             variant="contained" 
             color="error" 
@@ -34,6 +26,7 @@ function UserList() {
       </div>
       
       <UserCards/>
+      
       
     </div>
   )
