@@ -18,6 +18,8 @@ import PersonAddAltTwoToneIcon from '@mui/icons-material/PersonAddAltTwoTone';
 import RecentActorsTwoToneIcon from '@mui/icons-material/RecentActorsTwoTone';
 import AccountBalanceTwoToneIcon from '@mui/icons-material/AccountBalanceTwoTone';
 
+
+
 const navlinks = [
     {
         name: "User List",
@@ -104,7 +106,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const Sidebar = (props) => {
-    const navigate = useNavigate();
+  
+  const navigate = useNavigate();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 

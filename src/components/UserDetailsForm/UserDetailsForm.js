@@ -1,16 +1,15 @@
-import { Paper, Typography, TextField, Button, RadioGroup, FormControl, FormLabel, FormControlLabel, Radio, Select, InputLabel, MenuItem, Grid } from '@mui/material';
+import { Paper, Typography, TextField, Button, RadioGroup, FormControl, FormLabel, FormControlLabel, Radio, Select, InputLabel, MenuItem, Grid, FormHelperText } from '@mui/material';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { v4 as uuidv4 } from 'uuid'
-
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
-
 import * as services from '../../services/unifetch';
 import CircularProgress from '@mui/material/CircularProgress';
 import Creatable from 'react-select/creatable';
+
 
 
 const hobbies = [
@@ -25,8 +24,7 @@ const customStyles = {
   option:(provided,state)=>({
       ...provided,
       // color: state.isSelected ?"red":"blue",
-      // backgroundColor:"blue",
-      
+      // backgroundColor:"blue",   
   }),
   valueContainer:(provided,state)=>({
     ...provided,
@@ -44,15 +42,20 @@ const customStyles = {
   })
 }
 
-
 function UserDetailsForm() {
+
+
+
+
+
+
   const navigate = useNavigate();
 
   const[fullname,setFullName]=useState('');
   const[address,setAddress]=useState('')
 
   const [dob, setDob] = React.useState(new Date());
-  const [gender, setGender] = React.useState('');
+  const [gender, setGender] = React.useState('female');
   
   const [country,setCountry] = useState('');
   const [countryData,setCountryData] = useState([]);
@@ -65,6 +68,119 @@ function UserDetailsForm() {
 
   const [shortbio,setShortBio] = useState('')
   const [longbio,setLongBio] = useState('');
+
+
+
+
+  const[errors,setErrors]=useState({});
+
+const countryValid = () =>{
+  if(country.length===0){
+    return ("Select country, field cannot be empty*");
+  }
+  else{
+    return ("");
+  }
+}
+
+const nameValid = () =>{
+  if(fullname.length===0){
+    return ("This field is Required*");
+  }else if(fullname.trim().length===0){
+    return ("Enter valid name, spaces detected");
+  }else if(fullname.length<2){
+    return ("Single character not allowed*")
+  }
+  else{
+    return ("");
+  }
+}
+
+const addressValid = () =>{
+  if(address.length===0){
+    return ("This field is Required*");
+  }else if(address.trim().length===0){
+    return ("Enter valid Bio, spaces detected*");
+  }else if(address.length<3){
+    return ("Address too short*")
+  }
+  else if(address.length>150){
+    return ("Address too Long*")
+  }
+  else{
+    return ("");
+  }
+}
+
+const shortbioValid = () =>{
+  if(shortbio.length===0){
+    return ("This field is Required*");
+  }else if(shortbio.trim().length===0){
+    return ("Enter valid Bio, spaces detected*");
+  }else if(shortbio.length<10){
+    return ("Bio too short*")
+  }
+  else if(shortbio.length>30){
+    return ("Bio too Long*")
+  }
+  else{
+    return ("");
+  }
+}
+
+
+
+const longbioValid = () =>{
+  if(longbio.length===0){
+    return ("This field is Required*");
+  }else if(longbio.trim().length===0){
+    return ("Enter valid Bio, spaces detected*");
+  }else if(longbio.length<50){
+    return ("Bio too short*")
+  }
+  else if(longbio.length>100){
+    return ("Bio too Long*")
+  }
+  else{
+    return ("");
+  }
+}
+
+const hobbiesValid = () =>{
+  if(hobbiesvalue.length===0){
+    return ("This field is required");
+  }
+  else{
+    return ("");
+  }
+} 
+
+
+
+  const validate = () =>{
+    let temp = {}
+    temp.fullName = nameValid();
+    temp.address= addressValid();
+    // temp.address =  (/.+@.+..+/).test(address) ? "" :"Email is not valid*"
+    temp.country = countryValid();
+    temp.hobbiesvalue = hobbiesValid();
+    temp.college = college.length!==0 ? "" :"This field is required";
+    temp.shortbio = shortbioValid();
+    temp.longbio = longbioValid();
+    setErrors({
+      ...temp
+    })
+
+    return Object.values(temp).every(x => x === "")
+  }
+
+
+
+
+
+
+
+
 
   useEffect(
     ()=>{
@@ -90,8 +206,6 @@ function UserDetailsForm() {
     }
   }
 
-
-
   const handleCountrySelect = (e) =>{
     setCountry(e.target.value)
     // console.log(e.target.value);
@@ -105,7 +219,6 @@ function UserDetailsForm() {
     })
     .catch((e)=>{console.error(e)})
 }
-
 
   const setUser = (data) => {  
     let x = localStorage.getItem("userData");
@@ -125,13 +238,9 @@ function UserDetailsForm() {
     }
   }
 
-  const handleOnSubmit = () => {
-
-    if(fullname=== "" || dob === "" || address === "" || gender === "" || 
-       hobbies=== "" || country === "" || college === "" || shortbio === "" ||
-       longbio === "" ) {
-        alert("Please Fill All Required The Fields");
-    }else{
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    if(validate()){
       const userDetails={
         id:uuidv4(),
         fullname:fullname,
@@ -146,13 +255,9 @@ function UserDetailsForm() {
       };
   
       console.log(userDetails);
-  
       setUser(userDetails);
-  
       navigate('/');
     }
-
-    
   }
 
   return (
@@ -161,33 +266,18 @@ function UserDetailsForm() {
       flexDirection:"column",
       alignItems:"center",
     }}>     
-      
-      {/* <Typography style={{float:"left"}} variant='h6' color="" onClick={()=>{navigate('/')}}>Back To Home</Typography>
-      <br/> */}
 
-      {/* <Box
-      sx={{
-        display: "flex",
-        alignItems:"center",
-        "& > :not(style)": {
-          m: 1,
-          width: "20rem",
-          height: "auto",
-          borderRadius: "25px",
-          padding:"2rem",
-          
-        }
-      }}
-    > */}
       <Grid container sx={{width:"70%",justifyContent:"center",marginTop:"5rem"}}>
       <Grid item xs={12} sm={12} md={12} lg={12} >
         
       <Paper elevation={24} sx={{padding:"2rem", borderRadius:"25px"}} >
       <Typography variant='h6'fontSize="xx-large" color="primary">User Details</Typography>
       <br/>
-      <form onSubmit={handleOnSubmit}>
-        {/* <div style={{display:"flex",flexDirection:"column",gap:"1rem",margin:"1rem"}}> */}
+
+      <form onSubmit={handleOnSubmit}> 
+
         <Grid container spacing="1rem" sx={{alignItems:"center"}} >
+
 {/* ------------------------------------------------------------------------------------------------------------------- */}
         
             {/* NAME FIELD */}
@@ -201,7 +291,10 @@ function UserDetailsForm() {
                 onChange={(e)=>{
                   setFullName(e.target.value);
                 }}  
-                required
+                // required
+                // error
+                // helperText="Enter Full Name"
+                {...(errors.fullName && {error:true,helperText:errors.fullName})}
               />
             </Grid>
 {/* ----------------------------------------------------------------------------------------------------------------- */}
@@ -217,7 +310,7 @@ function UserDetailsForm() {
               value={dob}
               onChange={(newValue) => {setDob(newValue)}}
               renderInput={(params) => <TextField {...params} />}
-              required
+              // required
             />
           </LocalizationProvider>
           </FormControl>
@@ -226,15 +319,6 @@ function UserDetailsForm() {
 
         {/* ADDRESS */}
         <Grid item xs={12} sm={12} md={6} lg={4} >
-          {/* <TextareaAutosize 
-            aria-label="empty textarea"
-            placeholder="Address"
-            style={{ height:"3rem",width: "17.6rem",maxHeight:"9rem", maxWidth:"17.6rem",minHeight:"3rem",minWidth:"17.6rem"}}
-            value={address}
-            onChange={(e)=>{
-              setAddress(e.target.value);
-            }}
-          /> */}
           <TextField 
               fullWidth
               multiline
@@ -245,7 +329,8 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setAddress(e.target.value);
               }}
-              required
+              // required
+              {...(errors.address && {error:true,helperText:errors.address})}
             />
         </Grid>
 
@@ -266,9 +351,9 @@ function UserDetailsForm() {
                 }
               }         
             >
-              <FormControlLabel value="female" control={<Radio required={true} />} label="Female" />
-              <FormControlLabel value="male" control={<Radio required={true} />} label="Male" />
-              <FormControlLabel value="other" control={<Radio required={true} />} label="Other" />
+              <FormControlLabel value="female" control={<Radio selected />} label="Female" />
+              <FormControlLabel value="male" control={<Radio  />} label="Male" />
+              <FormControlLabel value="other" control={<Radio  />} label="Other" />
             </RadioGroup>
           </FormControl>
         </Grid>
@@ -277,7 +362,9 @@ function UserDetailsForm() {
 
         {/* SELECT AND ADD HOBBIES */}
         <Grid item xs={12} sm={12} md={6} lg={4}>
-          <FormControl fullWidth >
+          <FormControl fullWidth
+          {...(errors.hobbiesvalue && {error:true})}
+          >
             <Creatable
             isMulti
             onChange={(value)=>handleHobbyChange('hobbies',value)}
@@ -285,25 +372,27 @@ function UserDetailsForm() {
             value={hobbiesvalue}
             placeholder="Select Hobbies"
             styles={customStyles}
-            required
+            
             />
+            {errors.hobbiesvalue && <FormHelperText>{errors.hobbiesvalue}</FormHelperText>}
           </FormControl>
         </Grid>
 {/* ------------------------------------------------------------------------------------------------------ */}
         
         {/* SELECT COUNTRY */}
         <Grid item xs={12} sm={12} md={6} lg={4}>
-        <FormControl fullWidth>
+        <FormControl fullWidth
+        {...(errors.country && {error:true})}
+        >   
           <InputLabel id="demo-simple-select-autowidth-label">Country</InputLabel>
+         
           <Select
-            
             labelId="demo-simple-select-autowidth-label"
             id="demo-simple-select-autowidth"
             value={country}
             onChange={handleCountrySelect}
             autoWidth
-            label="Country"
-            required
+            label="Country"        
           >
             {
             countryData.map((cd) =>{
@@ -313,21 +402,24 @@ function UserDetailsForm() {
             })
           }
           </Select>
+          
+          {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+          
         </FormControl>
         </Grid>
 {/* ------------------------------------------------------------------------------------------------------------------ */}
 
         {/* SELECT COLLEGE */}
         <Grid item xs={12} sm={12} md={6} lg={4}>
-        <FormControl fullWidth>
+        <FormControl fullWidth 
+        {...(errors.college && {error:true})}
+        >
           <InputLabel id="demo-simple-select-autowidth-label">Colleges</InputLabel>
-          {
-          
+          {     
           (listLoading)?
           <CircularProgress />
             :<div></div>
-          }
-          
+          }     
           <Select
             labelId="demo-simple-select-autowidth-label"
             id="demo-simple-select-autowidth"
@@ -335,7 +427,7 @@ function UserDetailsForm() {
             onChange={(e) =>{setCollege(e.target.value)}}
             autoWidth
             label="Colleges"
-            required
+            
           >
             {
               collegeList.length?(
@@ -346,6 +438,7 @@ function UserDetailsForm() {
             })):<MenuItem key=" 123" value="123">No College Found</MenuItem>
           }
           </Select>
+          {errors.college && <FormHelperText>{errors.college}</FormHelperText>}
         </FormControl>
         </Grid>
 {/* ----------------------------------------------------------------------------------------------------------------- */}
@@ -361,23 +454,13 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setShortBio(e.target.value);
               }}
-              required
+              {...(errors.shortbio && {error:true,helperText:errors.shortbio})}
             />
           </Grid>
 {/* --------------------------------------------------------------------------------------------------------------------- */}
 
         {/* LONG BIO */}
         <Grid item xs={12} sm={12} md={6} lg={4}>
-          {/* <TextareaAutosize
-           
-            aria-label="empty textarea"
-            placeholder="Long Bio"
-            style={{ height:"3rem",width: "17.6rem",maxHeight:"9rem", maxWidth:"17.6rem",minHeight:"3rem",minWidth:"17.6rem"}}
-            value={longbio}
-            onChange={(e)=>{
-              setLongBio(e.target.value);
-            }}
-          /> */}
           <TextField 
               fullWidth
               multiline
@@ -388,21 +471,19 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setLongBio(e.target.value);
               }}
-              required
+              {...(errors.longbio && {error:true,helperText:errors.longbio})}
             />
         </Grid>
 {/* ------------------------------------------------------------------------------------------------------------------- */}
         <Grid item xs={12} sm={12} md={6} lg={4}>  
             <Button type="submit" sx={{width:"10rem"}} size="large" variant="contained">Submit</Button>
         </Grid>
-        {/* </div> */}
+
         </Grid>
       </form>
-      </Paper>
-      
+      </Paper>  
       </Grid>
       </Grid>
-    {/* </Box> */}
     </div>
   )
 }
