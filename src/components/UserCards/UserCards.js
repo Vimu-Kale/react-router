@@ -28,7 +28,9 @@ function UserCards() {
   return (
     <div>
       <div style={{margin:"2rem"}}>
+        
         <FormControlLabel
+        
          control={
             <Switch
                 checked={toggleChecked}
@@ -36,9 +38,10 @@ function UserCards() {
                 inputProps={{ 'aria-label': 'controlled' }}
             />
          }
-        label="Toggle Between Table View & Card View"
+          label="Toggle Between Table View & Card View"
+          labelPlacement='end'
         />
-            
+          
         </div>
       {
         toggleChecked?(

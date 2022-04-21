@@ -17,7 +17,7 @@ function College() {
     };
 
   return (
-    <div>
+    <div style={{marginTop:"4rem"}}>
         
         <Typography variant='h2' color="primary" margin={"2rem"}> College List </Typography>
         <div style={{margin:"2rem"}}>

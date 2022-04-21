@@ -28,11 +28,15 @@ const customStyles = {
       // backgroundColor:"blue",
       
   }),
+  valueContainer:(provided,state)=>({
+    ...provided,
+    whiteSpace:"nowrap",
+    overflow:"hidden",
+    flexWrap:'nowrap',
+  }),
   control: base=>({
     ...base,
-    
-    
-    
+    height:"3.5rem",
   }),
   menu: base =>({
     ...base,
@@ -181,6 +185,7 @@ function UserDetailsForm() {
       <Paper elevation={24} sx={{padding:"2rem", borderRadius:"25px"}} >
       <Typography variant='h6'fontSize="xx-large" color="primary">User Details</Typography>
       <br/>
+      <form onSubmit={handleOnSubmit}>
         {/* <div style={{display:"flex",flexDirection:"column",gap:"1rem",margin:"1rem"}}> */}
         <Grid container spacing="1rem" sx={{alignItems:"center"}} >
 {/* ------------------------------------------------------------------------------------------------------------------- */}
@@ -196,6 +201,7 @@ function UserDetailsForm() {
                 onChange={(e)=>{
                   setFullName(e.target.value);
                 }}  
+                required
               />
             </Grid>
 {/* ----------------------------------------------------------------------------------------------------------------- */}
@@ -211,6 +217,7 @@ function UserDetailsForm() {
               value={dob}
               onChange={(newValue) => {setDob(newValue)}}
               renderInput={(params) => <TextField {...params} />}
+              required
             />
           </LocalizationProvider>
           </FormControl>
@@ -238,6 +245,7 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setAddress(e.target.value);
               }}
+              required
             />
         </Grid>
 
@@ -248,7 +256,7 @@ function UserDetailsForm() {
           <FormControl>
             <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
             <RadioGroup
-            row
+              row
               aria-labelledby="demo-radio-buttons-group-label"
               defaultValue="female"
               name="radio-buttons-group"
@@ -256,11 +264,11 @@ function UserDetailsForm() {
               onChange={(e) => {
                 setGender(e.target.value)
                 }
-              }
+              }         
             >
-              <FormControlLabel value="female" control={<Radio />} label="Female" />
-              <FormControlLabel value="male" control={<Radio />} label="Male" />
-              <FormControlLabel value="other" control={<Radio />} label="Other" />
+              <FormControlLabel value="female" control={<Radio required={true} />} label="Female" />
+              <FormControlLabel value="male" control={<Radio required={true} />} label="Male" />
+              <FormControlLabel value="other" control={<Radio required={true} />} label="Other" />
             </RadioGroup>
           </FormControl>
         </Grid>
@@ -269,7 +277,7 @@ function UserDetailsForm() {
 
         {/* SELECT AND ADD HOBBIES */}
         <Grid item xs={12} sm={12} md={6} lg={4}>
-          <FormControl >
+          <FormControl fullWidth >
             <Creatable
             isMulti
             onChange={(value)=>handleHobbyChange('hobbies',value)}
@@ -277,7 +285,7 @@ function UserDetailsForm() {
             value={hobbiesvalue}
             placeholder="Select Hobbies"
             styles={customStyles}
-            
+            required
             />
           </FormControl>
         </Grid>
@@ -295,6 +303,7 @@ function UserDetailsForm() {
             onChange={handleCountrySelect}
             autoWidth
             label="Country"
+            required
           >
             {
             countryData.map((cd) =>{
@@ -326,7 +335,7 @@ function UserDetailsForm() {
             onChange={(e) =>{setCollege(e.target.value)}}
             autoWidth
             label="Colleges"
-            
+            required
           >
             {
               collegeList.length?(
@@ -352,6 +361,7 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setShortBio(e.target.value);
               }}
+              required
             />
           </Grid>
 {/* --------------------------------------------------------------------------------------------------------------------- */}
@@ -378,14 +388,16 @@ function UserDetailsForm() {
               onChange={(e)=>{
                 setLongBio(e.target.value);
               }}
+              required
             />
         </Grid>
 {/* ------------------------------------------------------------------------------------------------------------------- */}
         <Grid item xs={12} sm={12} md={6} lg={4}>  
-            <Button sx={{width:"10rem"}} size="large" variant="contained" onClick={()=>{handleOnSubmit()}}>Submit</Button>
+            <Button type="submit" sx={{width:"10rem"}} size="large" variant="contained">Submit</Button>
         </Grid>
         {/* </div> */}
         </Grid>
+      </form>
       </Paper>
       
       </Grid>
