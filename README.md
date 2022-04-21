@@ -1,3 +1,9 @@
+Minimized SideBar
+![Screenshot 2022-04-21 105543](https://user-images.githubusercontent.com/100113963/164379920-e7fce144-aa67-4f68-9177-50341acf0379.png)
+
+SideBar Open
+![Screenshot 2022-04-21 105410](https://user-images.githubusercontent.com/100113963/164379560-26b77fc1-ff5c-408e-82c0-6aaa74a9b2b6.png)
+
 List View
 ![Screenshot 2022-04-20 132758](https://user-images.githubusercontent.com/100113963/164180359-db38293a-13c5-4938-94de-e62153e62722.png)
 
