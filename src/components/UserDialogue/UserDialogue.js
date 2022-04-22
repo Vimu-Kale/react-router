@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import UserUpdate from '../UserUpdate/UserUpdate';
 
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -162,7 +163,7 @@ function UserDialogue(props) {
                     }}
                 >
                     <Fade in={open}>
-                    <Box sx={style}>
+                    <Box sx={style}>         
                         <UserUpdate data={props.data} setOpen={setOpen}/>
                     </Box>
                     </Fade>

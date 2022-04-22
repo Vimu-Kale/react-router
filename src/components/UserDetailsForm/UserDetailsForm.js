@@ -7,11 +7,12 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import * as services from '../../services/unifetch';
+import * as validations from "../../services/validations";
 import CircularProgress from '@mui/material/CircularProgress';
 import Creatable from 'react-select/creatable';
 
 
-
+//INITIAL STATIC HOBBIES VALUES
 const hobbies = [
   {label:"Watching Movies", value:1},
   {label:"Fitness", value:2},
@@ -20,6 +21,8 @@ const hobbies = [
   {label:"Chess", value:5},
   {label:"Video Gaming", value:6},
 ]
+
+//CUSTOM STYLES FOR SELECT-REACT
 const customStyles = {
   option:(provided,state)=>({
       ...provided,
@@ -42,12 +45,10 @@ const customStyles = {
   })
 }
 
-function UserDetailsForm() {
 
 
-
-
-
+//USER DETAILS FORM COMPONENT
+const  UserDetailsForm = () => {
 
   const navigate = useNavigate();
 
@@ -69,119 +70,9 @@ function UserDetailsForm() {
   const [shortbio,setShortBio] = useState('')
   const [longbio,setLongBio] = useState('');
 
-
-
-
   const[errors,setErrors]=useState({});
 
-const countryValid = () =>{
-  if(country.length===0){
-    return ("Select country, field cannot be empty*");
-  }
-  else{
-    return ("");
-  }
-}
-
-const nameValid = () =>{
-  if(fullname.length===0){
-    return ("This field is Required*");
-  }else if(fullname.trim().length===0){
-    return ("Enter valid name, spaces detected");
-  }else if(fullname.length<2){
-    return ("Single character not allowed*")
-  }
-  else{
-    return ("");
-  }
-}
-
-const addressValid = () =>{
-  if(address.length===0){
-    return ("This field is Required*");
-  }else if(address.trim().length===0){
-    return ("Enter valid Bio, spaces detected*");
-  }else if(address.length<3){
-    return ("Address too short*")
-  }
-  else if(address.length>150){
-    return ("Address too Long*")
-  }
-  else{
-    return ("");
-  }
-}
-
-const shortbioValid = () =>{
-  if(shortbio.length===0){
-    return ("This field is Required*");
-  }else if(shortbio.trim().length===0){
-    return ("Enter valid Bio, spaces detected*");
-  }else if(shortbio.length<10){
-    return ("Bio too short*")
-  }
-  else if(shortbio.length>30){
-    return ("Bio too Long*")
-  }
-  else{
-    return ("");
-  }
-}
-
-
-
-const longbioValid = () =>{
-  if(longbio.length===0){
-    return ("This field is Required*");
-  }else if(longbio.trim().length===0){
-    return ("Enter valid Bio, spaces detected*");
-  }else if(longbio.length<50){
-    return ("Bio too short*")
-  }
-  else if(longbio.length>100){
-    return ("Bio too Long*")
-  }
-  else{
-    return ("");
-  }
-}
-
-const hobbiesValid = () =>{
-  if(hobbiesvalue.length===0){
-    return ("This field is required");
-  }
-  else{
-    return ("");
-  }
-} 
-
-
-
-  const validate = () =>{
-    let temp = {}
-    temp.fullName = nameValid();
-    temp.address= addressValid();
-    // temp.address =  (/.+@.+..+/).test(address) ? "" :"Email is not valid*"
-    temp.country = countryValid();
-    temp.hobbiesvalue = hobbiesValid();
-    temp.college = college.length!==0 ? "" :"This field is required";
-    temp.shortbio = shortbioValid();
-    temp.longbio = longbioValid();
-    setErrors({
-      ...temp
-    })
-
-    return Object.values(temp).every(x => x === "")
-  }
-
-
-
-
-
-
-
-
-
+  //LOADING COUNTRY DATA AS SOON AS COMPONENT IS MOUNTED
   useEffect(
     ()=>{
       axios
@@ -199,8 +90,7 @@ const hobbiesValid = () =>{
       case 'hobbies':
         setHobbiesValue(value);
         // console.log(value);
-        break;
-    
+        break;  
       default:
         break;
     }
@@ -208,21 +98,39 @@ const hobbiesValid = () =>{
 
   const handleCountrySelect = (e) =>{
     setCountry(e.target.value)
-    // console.log(e.target.value);
     setListLoading(true);
 
+    //FETCHING UNI DETAILS BASED ON COUNTRY 
     services.countryunifetch(e.target.value)
     .then(response =>{
       setCollegeList(response.data);
-      // console.log(response.data);
       setListLoading(false);
     })
     .catch((e)=>{console.error(e)})
 }
 
+//validate()  FOR FORM FIELD VALIDATIONS
+
+const validate = () =>{
+  let validateArray = {}
+  validateArray.fullName = validations.nameValid(fullname);
+  validateArray.address= validations.addressValid(address);
+  validateArray.country = validations.countryValid(country);
+  validateArray.hobbiesvalue = validations.hobbiesValid(hobbiesvalue);
+  validateArray.college = validations.collegeValid(college)
+  validateArray.shortbio = validations.shortbioValid(shortbio);
+  validateArray.longbio = validations.longbioValid(longbio);
+  setErrors({
+    ...validateArray
+  })
+  //RETURNS TRUE IF NO ERRORS
+  return Object.values(validateArray).every(x => x === "")
+}
+
+// SETTING USER DETAILS TO THE LOCAL STORAGE 
   const setUser = (data) => {  
     let x = localStorage.getItem("userData");
-    console.log(x);
+    // console.log(x);
     if(x){
       let a = [];
       a = JSON.parse(localStorage.getItem('userData')) || [];
@@ -238,23 +146,28 @@ const hobbiesValid = () =>{
     }
   }
 
+  //HANDELING THE FORM SUBMIT
   const handleOnSubmit = (e) => {
     e.preventDefault();
+
+    //CALLING THE VALIDATE() 
     if(validate()){
+
+      //SETTING ALL THE DETAILS INTO SINGLE OBJECT
       const userDetails={
         id:uuidv4(),
-        fullname:fullname,
-        dob:dob,
-        address:address,
-        gender:gender,
+        fullname,
+        dob,
+        address,
+        gender,
         hobbies:hobbiesvalue,
-        country:country,
-        college:college,
-        shortbio:shortbio,
-        longbio:longbio,      
+        country,
+        college,
+        shortbio,
+        longbio,      
       };
   
-      console.log(userDetails);
+      // console.log(userDetails);
       setUser(userDetails);
       navigate('/');
     }
@@ -267,222 +180,219 @@ const hobbiesValid = () =>{
       alignItems:"center",
     }}>     
 
+      {/* CARD CONTAINER */}
       <Grid container sx={{width:"70%",justifyContent:"center",marginTop:"5rem"}}>
-      <Grid item xs={12} sm={12} md={12} lg={12} >
-        
-      <Paper elevation={24} sx={{padding:"2rem", borderRadius:"25px"}} >
-      <Typography variant='h6'fontSize="xx-large" color="primary">User Details</Typography>
-      <br/>
+        <Grid item xs={12} sm={12} md={12} lg={12} >      
+          <Paper elevation={24} sx={{padding:"2rem", borderRadius:"25px"}} >
+          <Typography variant='h6'fontSize="xx-large" color="primary">User Details</Typography>
+          <br/>
+            <form onSubmit={handleOnSubmit}> 
+              {/* FORM CONTAINER */}
+              <Grid container spacing="1rem" sx={{alignItems:"center"}} >
+      {/* ------------------------------------------------------------------------------------------------------------------- */}
+                  {/* NAME FIELD */}
+                  <Grid item xs={12} sm={12} md={3} lg={4}>
+                    <TextField 
+                      fullWidth
+                      id="outlined-basic" 
+                      label="Full Name" 
+                      variant="outlined"
+                      value={fullname}
+                      onChange={(e)=>{
+                        setFullName(e.target.value);
+                      }}  
+                      // required
+                      // error
+                      // helperText="Enter Full Name"
+                      {...(errors.fullName && {error:true,helperText:errors.fullName})}
+                    />
+                  </Grid>
+      {/* ----------------------------------------------------------------------------------------------------------------- */}
 
-      <form onSubmit={handleOnSubmit}> 
+              {/* DATE PICKER */}
+              <Grid item xs={12} sm={12} md={3} lg={4}>
+                <FormControl fullWidth>
+                <LocalizationProvider dateAdapter={AdapterDateFns} >
+                  <MobileDatePicker
+                    label="Date of Birth"
+                    inputFormat="dd/MM/yyyy"
+                    maxDate={new Date()}
+                    value={dob}
+                    onChange={(newValue) => {setDob(newValue)}}
+                    renderInput={(params) => <TextField {...params} />}
+                    // required
+                  />
+                </LocalizationProvider>
+                </FormControl>
+              </Grid>
+      {/* --------------------------------------------------------------------------------------------------------------------- */}
 
-        <Grid container spacing="1rem" sx={{alignItems:"center"}} >
+              {/* ADDRESS */}
+              <Grid item xs={12} sm={12} md={6} lg={4} >
+                <TextField 
+                    fullWidth
+                    // multiline
+                    id="outlined-basic" 
+                    label="Address" 
+                    variant="outlined"
+                    value={address}
+                    onChange={(e)=>{
+                      setAddress(e.target.value);
+                    }}
+                    // required
+                    {...(errors.address && {error:true,helperText:errors.address})}
+                  />
+              </Grid>
 
-{/* ------------------------------------------------------------------------------------------------------------------- */}
-        
-            {/* NAME FIELD */}
-            <Grid item xs={12} sm={12} md={3} lg={4}>
-              <TextField 
-                fullWidth
-                id="outlined-basic" 
-                label="Full Name" 
-                variant="outlined"
-                value={fullname}
-                onChange={(e)=>{
-                  setFullName(e.target.value);
-                }}  
-                // required
-                // error
-                // helperText="Enter Full Name"
-                {...(errors.fullName && {error:true,helperText:errors.fullName})}
-              />
-            </Grid>
-{/* ----------------------------------------------------------------------------------------------------------------- */}
+      {/* ------------------------------------------------------------------------------------------------------------------- */}
 
-        {/* DATE PICKER */}
-        <Grid item xs={12} sm={12} md={3} lg={4}>
-          <FormControl fullWidth>
-          <LocalizationProvider dateAdapter={AdapterDateFns} >
-            <MobileDatePicker
-              label="Date of Birth"
-              inputFormat="dd/MM/yyyy"
-              maxDate={new Date()}
-              value={dob}
-              onChange={(newValue) => {setDob(newValue)}}
-              renderInput={(params) => <TextField {...params} />}
-              // required
-            />
-          </LocalizationProvider>
-          </FormControl>
-        </Grid>
-{/* --------------------------------------------------------------------------------------------------------------------- */}
+              {/* GENDER */}
+              <Grid item sm={12} md={6} lg={4}>
+                <FormControl>
+                  <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-radio-buttons-group-label"
+                    defaultValue="female"
+                    name="radio-buttons-group"
+                    value={gender}
+                    onChange={(e) => {
+                      setGender(e.target.value)
+                      }
+                    }         
+                  >
+                    <FormControlLabel value="female" control={<Radio selected />} label="Female" />
+                    <FormControlLabel value="male" control={<Radio  />} label="Male" />
+                    <FormControlLabel value="other" control={<Radio  />} label="Other" />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
 
-        {/* ADDRESS */}
-        <Grid item xs={12} sm={12} md={6} lg={4} >
-          <TextField 
-              fullWidth
-              multiline
-              id="outlined-basic" 
-              label="Address" 
-              variant="outlined"
-              value={address}
-              onChange={(e)=>{
-                setAddress(e.target.value);
-              }}
-              // required
-              {...(errors.address && {error:true,helperText:errors.address})}
-            />
-        </Grid>
+      {/* ---------------------------------------------------------------------------------------------------- */}
 
-{/* ------------------------------------------------------------------------------------------------------------------- */}
-
-        {/* GENDER */}
-        <Grid item sm={12} md={6} lg={4}>
-          <FormControl>
-            <FormLabel id="demo-radio-buttons-group-label">Gender</FormLabel>
-            <RadioGroup
-              row
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="female"
-              name="radio-buttons-group"
-              value={gender}
-              onChange={(e) => {
-                setGender(e.target.value)
+              {/* SELECT AND ADD HOBBIES */}
+              <Grid item xs={12} sm={12} md={6} lg={4}>
+                <FormControl fullWidth
+                {...(errors.hobbiesvalue && {error:true})}
+                >
+                  <Creatable
+                  isMulti
+                  onChange={(value)=>handleHobbyChange('hobbies',value)}
+                  options={hobbies}
+                  value={hobbiesvalue}
+                  placeholder="Select Hobbies"
+                  styles={customStyles}
+                  
+                  />
+                  {errors.hobbiesvalue && <FormHelperText>{errors.hobbiesvalue}</FormHelperText>}
+                </FormControl>
+              </Grid>
+      {/* ------------------------------------------------------------------------------------------------------ */}
+              
+              {/* SELECT COUNTRY */}
+              <Grid item xs={12} sm={12} md={6} lg={4}>
+              <FormControl fullWidth
+              {...(errors.country && {error:true})}
+              >   
+                <InputLabel id="demo-simple-select-autowidth-label">Country</InputLabel>
+              
+                <Select
+                  labelId="demo-simple-select-autowidth-label"
+                  id="demo-simple-select-autowidth"
+                  value={country}
+                  onChange={handleCountrySelect}
+                  autoWidth
+                  label="Country"        
+                >
+                  {
+                  countryData.map((cd) =>{
+                    return (
+                      <MenuItem key={cd.name.common} value={cd.name.common}>{cd.name.common}</MenuItem>
+                    );
+                  })
                 }
-              }         
-            >
-              <FormControlLabel value="female" control={<Radio selected />} label="Female" />
-              <FormControlLabel value="male" control={<Radio  />} label="Male" />
-              <FormControlLabel value="other" control={<Radio  />} label="Other" />
-            </RadioGroup>
-          </FormControl>
-        </Grid>
+                </Select>
+                
+                {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+                
+              </FormControl>
+              </Grid>
+      {/* ------------------------------------------------------------------------------------------------------------------ */}
 
-{/* ---------------------------------------------------------------------------------------------------- */}
+              {/* SELECT COLLEGE */}
+              <Grid item xs={12} sm={12} md={6} lg={4}>
+              <FormControl fullWidth 
+              {...(errors.college && {error:true})}
+              >
+                <InputLabel id="demo-simple-select-autowidth-label">Colleges</InputLabel>
+                {     
+                (listLoading)?
+                <CircularProgress />
+                  :<div></div>
+                }     
+                <Select
+                  labelId="demo-simple-select-autowidth-label"
+                  id="demo-simple-select-autowidth"
+                  value={college}
+                  onChange={(e) =>{setCollege(e.target.value)}}
+                  autoWidth
+                  label="Colleges"
+                  
+                >
+                  {
+                    collegeList.length?(
+                    collegeList.map((college,i) =>{
+                    return (
+                      <MenuItem key={i+1} value={college.name}>{college.name}</MenuItem>
+                    );
+                  })):<MenuItem key=" 123" value="123">No College Found</MenuItem>
+                }
+                </Select>
+                {errors.college && <FormHelperText>{errors.college}</FormHelperText>}
+              </FormControl>
+              </Grid>
+      {/* ----------------------------------------------------------------------------------------------------------------- */}
 
-        {/* SELECT AND ADD HOBBIES */}
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <FormControl fullWidth
-          {...(errors.hobbiesvalue && {error:true})}
-          >
-            <Creatable
-            isMulti
-            onChange={(value)=>handleHobbyChange('hobbies',value)}
-            options={hobbies}
-            value={hobbiesvalue}
-            placeholder="Select Hobbies"
-            styles={customStyles}
-            
-            />
-            {errors.hobbiesvalue && <FormHelperText>{errors.hobbiesvalue}</FormHelperText>}
-          </FormControl>
-        </Grid>
-{/* ------------------------------------------------------------------------------------------------------ */}
-        
-        {/* SELECT COUNTRY */}
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-        <FormControl fullWidth
-        {...(errors.country && {error:true})}
-        >   
-          <InputLabel id="demo-simple-select-autowidth-label">Country</InputLabel>
-         
-          <Select
-            labelId="demo-simple-select-autowidth-label"
-            id="demo-simple-select-autowidth"
-            value={country}
-            onChange={handleCountrySelect}
-            autoWidth
-            label="Country"        
-          >
-            {
-            countryData.map((cd) =>{
-              return (
-                <MenuItem key={cd.name.common} value={cd.name.common}>{cd.name.common}</MenuItem>
-              );
-            })
-          }
-          </Select>
-          
-          {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
-          
-        </FormControl>
-        </Grid>
-{/* ------------------------------------------------------------------------------------------------------------------ */}
+                {/* SHORT BIO */}
+                <Grid item xs={12} sm={12} md={6} lg={4}>
+                  <TextField 
+                    fullWidth
+                    id="outlined-basic" 
+                    label="Short-Bio" 
+                    variant="outlined"
+                    value={shortbio}
+                    onChange={(e)=>{
+                      setShortBio(e.target.value);
+                    }}
+                    {...(errors.shortbio && {error:true,helperText:errors.shortbio})}
+                  />
+                </Grid>
+      {/* --------------------------------------------------------------------------------------------------------------------- */}
 
-        {/* SELECT COLLEGE */}
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-        <FormControl fullWidth 
-        {...(errors.college && {error:true})}
-        >
-          <InputLabel id="demo-simple-select-autowidth-label">Colleges</InputLabel>
-          {     
-          (listLoading)?
-          <CircularProgress />
-            :<div></div>
-          }     
-          <Select
-            labelId="demo-simple-select-autowidth-label"
-            id="demo-simple-select-autowidth"
-            value={college}
-            onChange={(e) =>{setCollege(e.target.value)}}
-            autoWidth
-            label="Colleges"
-            
-          >
-            {
-              collegeList.length?(
-              collegeList.map((college,i) =>{
-              return (
-                <MenuItem key={i+1} value={college.name}>{college.name}</MenuItem>
-              );
-            })):<MenuItem key=" 123" value="123">No College Found</MenuItem>
-          }
-          </Select>
-          {errors.college && <FormHelperText>{errors.college}</FormHelperText>}
-        </FormControl>
-        </Grid>
-{/* ----------------------------------------------------------------------------------------------------------------- */}
+              {/* LONG BIO */}
+              <Grid item xs={12} sm={12} md={6} lg={4}>
+                <TextField 
+                    fullWidth
+                    // multiline
+                    id="outlined-basic" 
+                    label="Long-Bio" 
+                    variant="outlined"
+                    value={longbio}
+                    onChange={(e)=>{
+                      setLongBio(e.target.value);
+                    }}
+                    {...(errors.longbio && {error:true,helperText:errors.longbio})}
+                  />
+              </Grid>
+      {/* ------------------------------------------------------------------------------------------------------------------- */}
+              <Grid item xs={12} sm={12} md={6} lg={4}>  
+                  <Button type="submit" sx={{width:"10rem"}} size="large" variant="contained">Submit</Button>
+              </Grid>
 
-          {/* SHORT BIO */}
-          <Grid item xs={12} sm={12} md={6} lg={4}>
-            <TextField 
-              fullWidth
-              id="outlined-basic" 
-              label="Short-Bio" 
-              variant="outlined"
-              value={shortbio}
-              onChange={(e)=>{
-                setShortBio(e.target.value);
-              }}
-              {...(errors.shortbio && {error:true,helperText:errors.shortbio})}
-            />
-          </Grid>
-{/* --------------------------------------------------------------------------------------------------------------------- */}
-
-        {/* LONG BIO */}
-        <Grid item xs={12} sm={12} md={6} lg={4}>
-          <TextField 
-              fullWidth
-              multiline
-              id="outlined-basic" 
-              label="Long-Bio" 
-              variant="outlined"
-              value={longbio}
-              onChange={(e)=>{
-                setLongBio(e.target.value);
-              }}
-              {...(errors.longbio && {error:true,helperText:errors.longbio})}
-            />
+              </Grid>
+            </form>
+          </Paper>  
         </Grid>
-{/* ------------------------------------------------------------------------------------------------------------------- */}
-        <Grid item xs={12} sm={12} md={6} lg={4}>  
-            <Button type="submit" sx={{width:"10rem"}} size="large" variant="contained">Submit</Button>
-        </Grid>
-
-        </Grid>
-      </form>
-      </Paper>  
-      </Grid>
       </Grid>
     </div>
   )
